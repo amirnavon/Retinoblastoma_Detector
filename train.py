@@ -4,6 +4,7 @@ from torch.nn import CrossEntropyLoss
 from models.detector import RetinoblastomaDetector
 from utils.dataset import load_dataset
 from utils.evaluation import evaluate_model, plot_loss
+import json
 
 # Load data
 data_dir = "Training"
@@ -63,3 +64,12 @@ torch.save(model.state_dict(), "models/retinoblastoma_detector.pth")
 evaluate_model(model, test_loader, class_names, device)
 plot_loss(train_losses, test_losses)
 
+
+loss_data = {
+    "train_losses": train_losses,
+    "test_losses": test_losses
+}
+with open("models/losses.json", "w") as f:
+    json.dump(loss_data, f)
+
+print("Training complete. Model and loss data saved.")
