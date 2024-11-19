@@ -16,9 +16,9 @@ scikit-learn = "^1.5.2"
 pandas = "^2.2.3"
 pillow = "^11.0.0"
 ipykernel = "^6.29.5"
-opencv-python-headless = "^4.10.0.84"
 seaborn = "^0.13.2"
 matplotlib = "^3.9.2"
+opencv-python-headless = "^4.10.0.84"
 
 
 [build-system]
