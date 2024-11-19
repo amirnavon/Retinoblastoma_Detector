@@ -16,8 +16,8 @@ train_size = int(0.8 * len(train_loader.dataset))
 validation_size = len(train_loader.dataset) - train_size
 train_dataset, validation_dataset = random_split(train_loader.dataset, [train_size, validation_size])
 
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
-validation_loader = torch.utils.data.DataLoader(validation_dataset, batch_size=32, shuffle=False)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=16, shuffle=True)
+validation_loader = torch.utils.data.DataLoader(validation_dataset, batch_size=16, shuffle=False)
 
 # Model, loss, optimizer
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
