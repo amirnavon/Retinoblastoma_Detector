@@ -27,7 +27,7 @@ transform = transforms.Compose([
 ])
 
 # Helper function for prediction
-def predict(image, model, device, threshold=0.4):  # Match training threshold
+def predict(image, model, device, threshold=0.5):  # Match training threshold
     input_tensor = transform(image).unsqueeze(0).to(device)
     with torch.no_grad():
         outputs = model(input_tensor)
@@ -45,7 +45,7 @@ This AI-powered tool uses deep learning to provide reliable predictions.
 
 # Sidebar for settings
 st.sidebar.header("Settings")
-threshold = st.sidebar.slider("Confidence Threshold", min_value=0.1, max_value=1.0, value=0.4, step=0.05)  # Default threshold = training threshold
+threshold = st.sidebar.slider("Confidence Threshold", min_value=0.1, max_value=1.0, value=0.5, step=0.05)  # Default threshold = training threshold
 st.sidebar.write(f"Current Threshold: {threshold:.2f}")
 
 # File uploader

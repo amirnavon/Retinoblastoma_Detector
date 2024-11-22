@@ -8,7 +8,7 @@ def load_dataset(data_dir):
         transforms.Normalize([0.5], [0.5])
     ])
     dataset = datasets.ImageFolder(data_dir, transform=transform)
-    train_loader = DataLoader(dataset, batch_size=8, shuffle=True)
+    train_loader = DataLoader(dataset, batch_size=64, shuffle=True)
     return train_loader, dataset.classes
 
 

@@ -16,8 +16,8 @@ train_size = int(0.7 * len(train_loader.dataset))
 validation_size = len(train_loader.dataset) - train_size
 train_dataset, validation_dataset = random_split(train_loader.dataset, [train_size, validation_size])
 
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=16, shuffle=True)
-validation_loader = torch.utils.data.DataLoader(validation_dataset, batch_size=16, shuffle=False)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
+validation_loader = torch.utils.data.DataLoader(validation_dataset, batch_size=64, shuffle=False)
 
 # Model, loss, optimizer
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,11 +33,11 @@ criterion = CrossEntropyLoss(weight=class_weights.to(device))
 optimizer = Adam(model.parameters(), lr=2e-4)
 
 # Training
-num_epochs = 9
+num_epochs = 25
 train_losses, validation_losses = [], []
 
 best_val_loss = float('inf')  # Initialize the best validation loss
-patience = 3  # Number of epochs to wait for improvement
+patience = 100  # Number of epochs to wait for improvement
 wait = 0  # Counter for early stopping
 
 for epoch in range(num_epochs):
