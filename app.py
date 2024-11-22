@@ -1,20 +1,23 @@
 import streamlit as st
+from PIL import Image, ImageDraw
 import torch
-from PIL import Image
 from torchvision import transforms
 import numpy as np
-import cv2
 from models.detector import RetinoblastomaDetector
-from models.eye_detector import extract_eyes_from_face
+
+# Set page configuration - must be the first Streamlit command
+st.set_page_config(page_title="Retinoblastoma Detector", layout="wide")
 
 # Initialize the model
-device = torch.device("cpu")  # Ensure it runs on CPU
-model = RetinoblastomaDetector()
-model.load_state_dict(torch.load("models/retinoblastoma_detector.pth", map_location=device))
-model.eval()
+@st.cache_resource
+def load_model():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = RetinoblastomaDetector().to(device)
+    model.load_state_dict(torch.load("models/retinoblastoma_detector.pth", map_location=device))
+    model.eval()
+    return model, device
 
-# Define classes
-class_names = ["Healthy", "Retinoblastoma"]
+model, device = load_model()
 
 # Define image transform
 transform = transforms.Compose([
@@ -23,90 +26,84 @@ transform = transforms.Compose([
     transforms.Normalize([0.5], [0.5])
 ])
 
-
-# Define function for classification
-def classify_eye(image):
+# Helper function for prediction
+def predict(image, model, device, threshold=0.4):  # Match training threshold
     input_tensor = transform(image).unsqueeze(0).to(device)
     with torch.no_grad():
-        output = model(input_tensor)
-        _, predicted = torch.max(output, 1)
-        confidence = torch.softmax(output, 1).max().item()
-    return class_names[predicted.item()], confidence
+        outputs = model(input_tensor)
+        probabilities = torch.softmax(outputs, dim=1).cpu().numpy()[0]
+        confidence = probabilities.max()
+        predicted_class = 1 if probabilities[1] > threshold else 0
+    return predicted_class, confidence, probabilities
 
-
-# Streamlit App Layout
-st.set_page_config(page_title="Retinoblastoma Detector", layout="wide", initial_sidebar_state="expanded")
-
-# Sidebar Section
-st.sidebar.title("🩺 Retinoblastoma Detector")
-st.sidebar.write("""
-This app detects **retinoblastoma** from uploaded images of eyes or faces.
-- Upload an image (eye or face).
-- Adjust the confidence threshold if needed.
-- View results and confidence levels.
-""")
-confidence_threshold = st.sidebar.slider("Confidence Threshold", 0.0, 1.0, 0.5)
-
-# Main Section
-st.title("🎯 Retinoblastoma Detection App")
+# App title
+st.title("🔍 Retinoblastoma Detector")
 st.markdown("""
-Detect **retinoblastoma** from eye or face images using deep learning. 
-Upload your images and let the app analyze them for signs of the disease.
+Upload a photo of an eye or face to detect retinoblastoma and assess the risk level. 
+This AI-powered tool uses deep learning to provide reliable predictions.
 """)
 
-uploaded_file = st.file_uploader("Choose an image (jpg, jpeg, png)", type=["jpg", "jpeg", "png"])
+# Sidebar for settings
+st.sidebar.header("Settings")
+threshold = st.sidebar.slider("Confidence Threshold", min_value=0.1, max_value=1.0, value=0.4, step=0.05)  # Default threshold = training threshold
+st.sidebar.write(f"Current Threshold: {threshold:.2f}")
+
+# File uploader
+uploaded_file = st.file_uploader("Upload a Photo (JPEG or PNG)", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
-    # Load the uploaded image
-    image = np.array(Image.open(uploaded_file))
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    # Display uploaded image
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Uploaded Image", use_container_width=True)
 
-    # Detect eyes if the photo is of a face
-    eyes = extract_eyes_from_face(image)
+    # Make prediction
+    predicted_class, confidence, probabilities = predict(image, model, device, threshold)
 
-    if eyes:
-        st.subheader(f"👀 Detected {len(eyes)} Eye(s) in the Image")
-        results = []
-        for idx, eye in enumerate(eyes):
-            eye_pil = Image.fromarray(cv2.cvtColor(eye, cv2.COLOR_BGR2RGB))
-            prediction, confidence = classify_eye(eye_pil)
+    # Class mapping
+    class_names = ["Healthy Eye", "Retinoblastoma"]
+    prediction = class_names[predicted_class]
 
-            if confidence >= confidence_threshold:
-                st.write(f"**Eye {idx + 1}: {prediction} ({confidence:.2%} confidence)**")
-                st.progress(confidence)
-                st.image(eye, caption=f"Eye {idx + 1}: {prediction}", use_column_width=True)
-            else:
-                st.write(f"**Eye {idx + 1}: Low Confidence ({confidence:.2%})**")
-                st.progress(confidence)
-
-            results.append((prediction, confidence))
-
-        # Results Summary
-        st.subheader("📊 Summary of Results")
-        healthy_count = sum(1 for r, c in results if r == "Healthy")
-        retinoblastoma_count = sum(1 for r, c in results if r == "Retinoblastoma")
-        st.write(f"**Healthy Eyes:** {healthy_count}")
-        st.write(f"**Detected Retinoblastoma Cases:** {retinoblastoma_count}")
-
+    # Display prediction
+    st.subheader("Prediction Results")
+    if confidence >= threshold:
+        st.success(f"Prediction: **{prediction}** (Confidence: {confidence:.2%})")
     else:
-        # If no eyes are detected, treat the uploaded image as an eye photo
-        st.subheader("🖼️ Single Eye Photo Detected")
-        eye_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        prediction, confidence = classify_eye(eye_pil)
+        st.warning(f"Prediction: Uncertain (Confidence: {confidence:.2%})")
 
-        if confidence >= confidence_threshold:
-            st.write(f"**Prediction: {prediction} ({confidence:.2%} confidence)**")
-            st.progress(confidence)
-        else:
-            st.write(f"**Low Confidence Prediction: {prediction} ({confidence:.2%})**")
-            st.progress(confidence)
+    # Improved Confidence Display
+    st.subheader("Confidence Scores")
+    for i, score in enumerate(probabilities):
+        st.write(f"{class_names[i]}: {score:.2%}")
+        st.progress(int(score * 100))
+
+    # Textual Interpretation based on confidence levels
+    if confidence >= 0.7:
+        st.info(f"The model has **high confidence** in the prediction: {prediction}.")
+    elif 0.5 <= confidence < 0.7:
+        st.warning(f"The model has **moderate confidence** in the prediction: {prediction}. Further testing is recommended.")
+    else:
+        st.error(f"The model is **uncertain** about the prediction. Confidence: {confidence:.2%}")
+
+    # Visual feedback (Draw rectangle or highlight region)
+    draw = ImageDraw.Draw(image)
+    if prediction == "Retinoblastoma":
+        draw.rectangle([(10, 10), (214, 214)], outline="red", width=5)
+    else:
+        draw.rectangle([(10, 10), (214, 214)], outline="green", width=5)
+    st.image(image, caption="Processed Image", use_container_width=True)
+
+# Add prediction history
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+if uploaded_file and confidence >= threshold:
+    st.session_state.history.append({"Image": uploaded_file.name, "Prediction": prediction, "Confidence": confidence})
+
+if st.session_state.history:
+    st.subheader("Prediction History")
+    st.table(st.session_state.history)
 
 # Footer
-st.sidebar.markdown("---")
-st.sidebar.write("""
-**Developed by:**  
-[Your Name] | AI-Powered Retinoblastoma Detection  
-[GitHub](https://github.com/YourGitHubUsername) | [LinkedIn](https://linkedin.com/in/YourProfile)
-""")
-
-
+st.markdown("---")
+# st.markdown("📧 **For questions or feedback, contact us at**: support@example.com")
+st.markdown("💻 **Source code available on [GitHub](https://github.com/amirnavon/Retinoblastoma_Detector.git)**")
