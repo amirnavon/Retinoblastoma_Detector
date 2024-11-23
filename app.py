@@ -27,7 +27,7 @@ transform = transforms.Compose([
 ])
 
 # Helper function for prediction
-def predict(image, model, device, threshold=0.5):  # Match training threshold
+def predict(image, model, device, threshold=0.45):  # Match training threshold
     input_tensor = transform(image).unsqueeze(0).to(device)
     with torch.no_grad():
         outputs = model(input_tensor)
