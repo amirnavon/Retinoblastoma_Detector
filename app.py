@@ -45,7 +45,7 @@ This AI-powered tool uses deep learning to provide reliable predictions.
 
 # Sidebar for settings
 st.sidebar.header("Settings")
-threshold = st.sidebar.slider("Confidence Threshold", min_value=0.1, max_value=1.0, value=0.5, step=0.05)  # Default threshold = training threshold
+threshold = st.sidebar.slider("Confidence Threshold", min_value=0.1, max_value=1.0, value=0.7, step=0.05)  # Default threshold = training threshold
 st.sidebar.write(f"Current Threshold: {threshold:.2f}")
 
 # File uploader
