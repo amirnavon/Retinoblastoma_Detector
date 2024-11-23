@@ -1,200 +1,208 @@
-# Retinoblastoma_Detector
- BIU DS17
 
- # Retinoblastoma Detector 🎯
+# **🎯 Retinoblastoma Detector**
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![PyTorch](https://img.shields.io/badge/Framework-PyTorch-red)
-![Streamlit](https://img.shields.io/badge/UI-Streamlit-green)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.40.1-orange)
 
-This is a deep learning-based project for detecting **Retinoblastoma**, a rare form of eye cancer, from images of eyes or faces. The tool provides an intuitive **web-based interface** for uploading images, performing predictions, and visualizing results. It uses **PyTorch** for model training, **Mediapipe** for eye detection, and **Streamlit** for the user interface.
-
----
-
-## 🚀 **Features**
-
-1. **Eye Detection**:
-   - Automatically detects eyes in face images using **Mediapipe**.
-   - Supports direct analysis of eye photos.
-
-2. **Disease Prediction**:
-   - Classifies eyes as either:
-     - **Healthy**
-     - **Retinoblastoma**
-
-3. **Interactive Web Interface**:
-   - Built with **Streamlit** for ease of use.
-   - Upload images, adjust thresholds, and view predictions dynamically.
-
-4. **Customizable Model**:
-   - Train a Convolutional Neural Network (CNN) with your own data.
-   - Includes data augmentation for better generalization.
+## **Introduction**
+Retinoblastoma is a rare but aggressive eye cancer, predominantly affecting children under the age of five. Early diagnosis is critical for preserving vision and improving survival rates. This project leverages **Convolutional Neural Networks (CNNs)** to classify eye images as either healthy or affected by retinoblastoma. The project integrates **PyTorch** for training, **data augmentation** for improved generalization, and a **Streamlit** interface for user-friendly, real-time predictions.
 
 ---
 
-## 🛠️ **Technologies Used**
-
-| Technology          | Purpose                                   |
-|----------------------|-------------------------------------------|
-| **Python**           | Programming language                     |
-| **PyTorch**          | Deep learning model                      |
-| **Streamlit**        | Web app for user interaction             |
-| **OpenCV (Headless)**| Image preprocessing                      |
-| **Mediapipe**        | Eye detection in face images             |
-| **Torchvision**      | Data augmentation and preprocessing      |
+## **✨ Features**
+- **Deep Learning Model**: Custom CNN for binary classification of eye images.
+- **Data Augmentation**: Techniques like flipping, rotation, and cropping to enhance dataset variability.
+- **Interactive Web App**: Upload an image and get predictions with confidence scores.
+- **Balanced Loss Function**: Weighted loss to address class imbalance.
 
 ---
 
-## 📂 **Project Structure**
+## **📂 Project Structure**
+| File/Directory       | Purpose                                                      |
+|-----------------------|-------------------------------------------------------------|
+| `train.py`           | Contains the code to train the CNN model, handle data, and apply early stopping. |
+| `evaluation.py`      | Evaluates the trained model, computes metrics, and visualizes results. |
+| `app.py`             | Implements the Streamlit application for real-time predictions. |
+| `utils/dataset.py`   | Handles data loading, preprocessing, and augmentations.       |
+| `utils/evaluation.py`| Contains utility functions for metric computation and visualization. |
+| `models/`            | Stores the custom model architecture (RetinoblastomaDetector). |
+| `Training/`          | Directory to hold the dataset with subfolders for healthy and diseased images. |
+| `models/losses.json` | Stores training and validation losses for analysis.          |
+| `models/retinoblastoma_detector.pth` | Saved weights of the trained model.           |
 
-```plaintext
-retinoblastoma-detector/
-├── Training/                     # Folder for training images
-│   ├── eye/                      # Healthy eye images
-│   ├── retinoblastoma/           # Retinoblastoma-affected eye images
-├── models/                       # Contains the model definitions
-│   ├── detector.py               # CNN model for classification
-│   ├── eye_detector.py           # Eye detection logic (Mediapipe)
-├── utils/                        # Utility scripts
-│   ├── dataset.py                # Dataset loading and preprocessing
-│   ├── evaluation.py             # Model evaluation and visualization
-├── train.py                      # Script for training the CNN
-├── app.py                        # Streamlit app file
-├── requirements.txt              # Dependency file for deployment
-└── README.md                     # Project documentation (this file)
-```
 ---
 
-## ⚙️ **Setup and Installation**
+## **💻 Technologies Used**
+| Technology           | Purpose                                                      |
+|-----------------------|-------------------------------------------------------------|
+| **Python**           | Main programming language used for the project.              |
+| **PyTorch**          | Deep learning framework used for model development.          |
+| **Torchvision**      | Provides utilities for image transformations and datasets.   |
+| **Streamlit**        | Web-based interface for real-time interaction with the model.|
+| **Pillow (PIL)**     | Image handling library for preprocessing and manipulation.   |
+| **Scikit-learn**     | Utility functions for metrics such as classification report. |
+| **JSON**             | Stores training and validation losses for plotting.          |
 
-### 1. Clone the Repository
-Clone the repository to your local machine:
-```bash
-git clone https://github.com/your-username/retinoblastoma-detector.git
-cd retinoblastoma-detector
-```
+---
 
-### 2. Install Dependencies
-This project uses Poetry for dependency management. If you don’t have Poetry installed, you can install it with pip:
-```bash
-pip install poetry
-```
-
-Then, install the dependencies:
-```bash
-poetry install
-```
-
-### 3. Prepare Training Data
-Organize the `Training/` folder with the following structure:
+## **📂 Dataset**
+The dataset is organized as follows:
 ```
 Training/
 ├── eye/                      # Healthy eye images
 │   ├── image1.jpg
 │   ├── image2.jpg
+│   ├── ...
 ├── retinoblastoma/           # Retinoblastoma-affected eye images
 │   ├── image1.jpg
 │   ├── image2.jpg
+│   ├── ...
 ```
 
-You can use your own images or publicly available datasets. Ensure there are sufficient samples in each category for effective training.
+**Data Augmentation**:
+- Random Horizontal Flip
+- Random Rotation
+- Color Jitter
+- Random Resized Crop
 
-### 4. Train the Model
+---
+
+## **🚀 Pipeline Overview**
+
+### **1. Data Preparation**
+- Augmentations are applied to increase the dataset's robustness.
+- Weighted cross-entropy loss balances class distribution.
+
+### **2. Model Training**
+- **Architecture**:
+  - Convolutional layers extract spatial features.
+  - Pooling layers reduce dimensionality.
+  - Fully connected layers classify features.
+- **Optimizer**: Adam optimizer with a learning rate of `2e-4`.
+- **Early Stopping**: Stops training when validation loss does not improve.
+
+### **3. Evaluation**
+- **Metrics**:
+  - Accuracy, Precision, Recall, F1-Score
+  - Confusion Matrix
+  - ROC-AUC Score
+- **Sample Results**:
+```
+Classification Report:
+                precision    recall  f1-score   support
+
+           eye       0.94      0.94      0.94        16
+retinoblastoma       0.93      0.93      0.93        15
+
+      accuracy                           0.94        31
+     macro avg       0.94      0.94      0.94        31
+  weighted avg       0.94      0.94      0.94        31
+
+ROC-AUC Score: 0.97
+```
+- **Confusion Matrix**:
+```
+[[15, 1],
+ [ 1, 14]]
+```
+
+### **4. Interactive Analysis**
+- The **Streamlit App** allows:
+  - Image uploads.
+  - Class predictions and confidence scores.
+  - Threshold adjustments for precision-recall trade-offs.
+
+---
+
+## **⚙️ Setup Instructions**
+
+### **1. Clone the Repository**
+```bash
+git clone https://github.com/your-username/retinoblastoma-detector.git
+cd retinoblastoma-detector
+```
+
+### **2. Install Dependencies**
+Install Poetry if not already installed:
+```bash
+pip install poetry
+```
+
+Then, install the project dependencies:
+```bash
+poetry install
+```
+
+### **3. Prepare the Dataset**
+Organize the dataset into the following structure:
+```
+Training/
+├── eye/
+├── retinoblastoma/
+```
+Augmentations will be applied automatically during training.
+
+### **4. Train the Model**
 Run the training script:
 ```bash
 poetry run python train.py
 ```
 
-This script:
-- Loads the training data.
-- Trains a CNN to classify healthy and diseased eyes.
-- Saves the trained model as `models/retinoblastoma_detector.pth`.
+### **5. Evaluate the Model**
+Run the evaluation script:
+```bash
+poetry run python evaluation.py
+```
 
----
-
-## 🌐 Run the Streamlit App
-Launch the Streamlit app with the following command:
+### **6. Launch the Web App**
+Run the Streamlit app:
 ```bash
 poetry run streamlit run app.py
 ```
-
-Then open your browser and navigate to:
-```
-http://localhost:8501
-```
+Visit `http://localhost:8501` in your browser.
 
 ---
 
-## 📊 How It Works
-
-1. **Eye Detection**:
-   - Face images are analyzed using Mediapipe to locate and crop eye regions.
-
-2. **Image Preprocessing**:
-   - Images are resized to `224x224`.
-   - Pixel values are normalized to `[0.5, 0.5]` mean and standard deviation.
-
-3. **Model Architecture**:
-   - The CNN is designed to classify eyes into two categories:
-     - Healthy
-     - Retinoblastoma
-
-4. **Inference**:
-   - Each cropped eye is passed through the trained model.
-   - The app outputs the classification along with a confidence score.
+## **🌍 Real-World Applications**
+1. **Telemedicine**:
+   - Enables remote diagnosis using standard smartphone images.
+2. **Pre-Screening Tool**:
+   - Flags high-risk cases for further examination.
+3. **Low-Resource Settings**:
+   - Compatible with non-specialized equipment for wider accessibility.
 
 ---
 
-## 📈 Future Improvements
+## **🚧 Future Improvements**
+1. **Eye Detection Using Mediapipe**:
+   - Integrate Mediapipe to detect and crop eye regions from face images, enabling support for broader input types like face photos.
 
-- **Pretrained Models**:
-  - Integrate pretrained models like ResNet for higher accuracy.
-  
-- **Dataset Expansion**:
-  - Incorporate larger and more diverse datasets for better generalization.
+2. **Dataset Expansion**:
+   - Acquire larger, diverse datasets from various demographics and real-world scenarios to improve model accuracy and generalizability.
 
-- **Batch Uploads**:
-  - Add support for analyzing multiple images in a single session.
+3. **Advanced Augmentation**:
+   - Implement techniques such as low-light adjustments and varying angles for better real-world robustness.
 
-- **Mobile Optimization**:
-  - Improve the Streamlit interface for better usability on mobile devices.
+4. **Pretrained Models**:
+   - Use pretrained architectures like ResNet or EfficientNet to enhance feature extraction and accuracy.
 
----
+5. **Explainable AI**:
+   - Add Grad-CAM visualizations to interpret model predictions and build user trust.
 
-## 🤝 Contributing
-
-We welcome contributions to improve this project! To contribute:
-1. Fork the repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add your feature"
-   ```
-4. Push to your branch:
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. Open a pull request on GitHub.
+6. **Enhanced Usability**:
+   - Support batch image uploads and develop a lightweight mobile app for remote access.
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
----
-
-## 📬 Contact
-
-For questions or feedback, feel free to reach out:
-
-- **Your Name**
-- [Your GitHub Profile](https://github.com/your-username)
-- [Your Email Address](mailto:youremail@example.com)
+## **📜 License**
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ---
+
+## **📬 Contact**
+For feedback or contributions:
+- **Name**: Taina Trahtenberg , Amir Navon
+- **GitHub**: [Your GitHub Profile](https://github.com/amirnavon)
 
