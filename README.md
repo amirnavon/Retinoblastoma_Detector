@@ -13,6 +13,7 @@ Retinoblastoma is a rare but aggressive eye cancer, predominantly affecting chil
 
 ## **✨ Features**
 - **Deep Learning Model**: Custom CNN for binary classification of eye images.
+- **Eye Detection with Mediapipe**: Automatically detects and crops eye regions from face images for diagnosis.
 - **Data Augmentation**: Techniques like flipping, rotation, and cropping to enhance dataset variability.
 - **Interactive Web App**: Upload an image and get predictions with confidence scores.
 - **Balanced Loss Function**: Weighted loss to address class imbalance.
@@ -24,7 +25,7 @@ Retinoblastoma is a rare but aggressive eye cancer, predominantly affecting chil
 |-----------------------|-------------------------------------------------------------|
 | `train.py`           | Contains the code to train the CNN model, handle data, and apply early stopping. |
 | `evaluation.py`      | Evaluates the trained model, computes metrics, and visualizes results. |
-| `app.py`             | Implements the Streamlit application for real-time predictions. |
+| `app.py`             | Implements the Streamlit application for real-time predictions, integrating Mediapipe for eye detection. |
 | `utils/dataset.py`   | Handles data loading, preprocessing, and augmentations.       |
 | `utils/evaluation.py`| Contains utility functions for metric computation and visualization. |
 | `models/`            | Stores the custom model architecture (RetinoblastomaDetector). |
@@ -32,7 +33,7 @@ Retinoblastoma is a rare but aggressive eye cancer, predominantly affecting chil
 | `models/losses.json` | Stores training and validation losses for analysis.          |
 | `models/retinoblastoma_detector.pth` | Saved weights of the trained model.           |
 
----
+----
 
 ## **💻 Technologies Used**
 | Technology           | Purpose                                                      |
@@ -40,6 +41,7 @@ Retinoblastoma is a rare but aggressive eye cancer, predominantly affecting chil
 | **Python**           | Main programming language used for the project.              |
 | **PyTorch**          | Deep learning framework used for model development.          |
 | **Torchvision**      | Provides utilities for image transformations and datasets.   |
+| **Mediapipe**        | Detects and crops eye regions from face images.              |
 | **Streamlit**        | Web-based interface for real-time interaction with the model.|
 | **Pillow (PIL)**     | Image handling library for preprocessing and manipulation.   |
 | **Scikit-learn**     | Utility functions for metrics such as classification report. |
@@ -176,22 +178,19 @@ Visit `http://localhost:8501` in your browser.
 ---
 
 ## **🚧 Future Improvements**
-1. **Eye Detection Using Mediapipe**:
-   - Integrate Mediapipe to detect and crop eye regions from face images, enabling support for broader input types like face photos.
-
-2. **Dataset Expansion**:
+1. **Dataset Expansion**:
    - Acquire larger, diverse datasets from various demographics and real-world scenarios to improve model accuracy and generalizability.
 
-3. **Advanced Augmentation**:
+2. **Advanced Augmentation**:
    - Implement techniques such as low-light adjustments and varying angles for better real-world robustness.
 
-4. **Pretrained Models**:
+3. **Pretrained Models**:
    - Use pretrained architectures like ResNet or EfficientNet to enhance feature extraction and accuracy.
 
-5. **Explainable AI**:
+4. **Explainable AI**:
    - Add Grad-CAM visualizations to interpret model predictions and build user trust.
 
-6. **Enhanced Usability**:
+5. **Enhanced Usability**:
    - Support batch image uploads and develop a lightweight mobile app for remote access.
 
 ---
