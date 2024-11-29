@@ -202,6 +202,6 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## **📬 Contact**
 For feedback or contributions:
-- **Name**: Taina Trahtenberg , Adi Albeg, Amir Navon
+- **Name**: Taina Trahtenberg , Amir Navon
 - **GitHub**: [Your GitHub Profile](https://github.com/amirnavon)
 
